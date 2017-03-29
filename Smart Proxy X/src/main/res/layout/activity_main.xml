@@ -1,48 +1,88 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent" >
+    android:layout_height="fill_parent"
+    android:background="@color/white">
 
     <LinearLayout
         android:id="@+id/configUrlLayout"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="13dp" >
+        android:layout_alignParentTop="true"
+        android:orientation="vertical">
 
- 		<TextView
-                android:id="@+id/textViewConfigUrlTitle"
+
+        <TextView
+            android:id="@+id/ip_change_tips"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/red"
+            android:padding="@dimen/activity_vertical_margin"
+            android:text="@string/ip_change_tips"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@color/text_6" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/activity_vertical_margin">
+
+            <TextView
+                android:id="@+id/proxy_ip_add_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/config_url"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
+                android:padding="3dp"
+                android:text="@string/proxy_ip_add"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="@color/text_6" />
 
-       <TextView
-                android:id="@+id/textViewConfigUrl"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/config_not_set_value"
-                android:textAppearance="?android:attr/textAppearanceSmall" />
+            <EditText
+                android:id="@+id/proxy_ip_add_et"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_centerVertical="true"
+                android:layout_toRightOf="@+id/proxy_ip_add_title"
+                android:background="@drawable/button_bg_white"
+                android:hint="@string/config_not_set_value"
+                android:text="10.12.66.140"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="@color/text_6" />
+        </RelativeLayout>
 
     </LinearLayout>
-   
-      <View
-        android:layout_width="fill_parent"
-        android:layout_height="1dp"
-        android:background="@android:color/darker_gray" 
-        android:layout_marginLeft="8dp" 
-        android:layout_marginRight="8dp"
-        android:alpha="0.4"/>
+
+
+    <com.kyleduo.switchbutton.SwitchButton
+        android:id="@+id/proxy_switch"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_below="@+id/configUrlLayout"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="@dimen/activity_vertical_margin"
+        android:padding="10dp"
+        app:kswTextOff="@string/off"
+        app:kswTextOn="@string/on" />
+
 
     <ScrollView
         android:id="@+id/scrollViewLog"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" >
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/proxy_switch"
+        android:layout_marginTop="@dimen/activity_vertical_margin">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical" >
+            android:orientation="vertical">
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/divider" />
 
             <TextView
                 android:id="@+id/textViewLog"
@@ -54,4 +94,4 @@
         </LinearLayout>
     </ScrollView>
 
-</TableLayout>
+</RelativeLayout>

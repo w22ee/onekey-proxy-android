@@ -3,7 +3,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.1.2'
+        classpath 'com.android.tools.build:gradle:2.3.0'
     }
 }
 apply plugin: 'com.android.application'
@@ -18,24 +18,23 @@ repositories {
 
 android {
     compileSdkVersion 23
-    buildToolsVersion "23.0.1"
+    buildToolsVersion '25.0.2'
     useLibrary 'org.apache.http.legacy'
     defaultConfig {
-        minSdkVersion 14
-        targetSdkVersion 19
+        minSdkVersion 21
+        targetSdkVersion 25
         versionCode 7
         versionName "1.6"
+        applicationId 'com.napos.onkey'
     }
-
     signingConfigs {
         release {
             storeFile file("[android.keystore]")
-            storePassword  System.getenv("KSTOREPWD")
+            storePassword System.getenv("KSTOREPWD")
             keyAlias "[smartproxy]"
-            keyPassword  System.getenv("KEYPWD")
+            keyPassword System.getenv("KEYPWD")
         }
     }
-
     buildTypes {
         release {
             minifyEnabled false
@@ -43,11 +42,13 @@ android {
             signingConfig signingConfigs.release
         }
     }
+    productFlavors {
+    }
 }
 
 dependencies {
     compile 'com.embarkmobile:zxing-android-minimal:2.0.0@aar'
     compile 'com.embarkmobile:zxing-android-integration:2.0.0@aar'
     compile 'com.google.zxing:core:3.0.1'
-
+    compile 'com.kyleduo.switchbutton:library:1.4.4'
 }

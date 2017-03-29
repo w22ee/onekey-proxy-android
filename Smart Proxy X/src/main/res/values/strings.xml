@@ -1,21 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">onekey</string>
-    <string name="menu_item_switch">Proxy</string>
-    <string name="menu_item_about">About</string>
-    <string name="menu_item_exit">Exit</string>
-    <string name="config_url">Config URL</string>
-    <string name="config_not_set_value">Not set</string>
-    <string name="config_url_scan">Scan an QR code</string>
-    <string name="config_url_manual">Type manually</string>
-    <string name="config_url_scan_hint">Scan the QR code of your config url</string>
-    <string name="btn_ok">OK</string>
-    <string name="btn_cancel">Cancel</string>
-    <string name="btn_more">More&#8230;</string>
-    <string name="vpn_connected_status">connected</string>
-    <string name="vpn_disconnected_status">disconnected</string>
-    <string name="about_info">SmartProxy is a smart TCP transparent proxy software just like its name. It is determined according to the rules of the configuration file using a proxy or directly connected. The biggest advantage is prevent DNS cache pollution, never lost connection, also very save electricity.</string>
-    <string name="exit_confirm_info">This will disconnect the VPN connection, Are you sure to exit?</string>
-    <string name="err_invalid_url">The config URL is invalid.</string>
-    <string name="config_url_hint">URL or local file path</string>
+    <string name="app_name">一键代理</string>
+    <string name="menu_item_switch">代理</string>
+    <string name="menu_item_about">关于</string>
+    <string name="menu_item_exit">退出</string>
+    <string name="config_url">配置地址</string>
+    <string name="config_not_set_value">未设置</string>
+    <string name="config_url_scan">扫描二维码</string>
+    <string name="config_url_manual">手动输入</string>
+    <string name="config_url_scan_hint">扫描配置地址的二维码</string>
+    <string name="btn_ok">确定</string>
+    <string name="btn_cancel">取消</string>
+    <string name="btn_more">更多&#8230;</string>
+    <string name="vpn_connected_status">已连接</string>
+    <string name="vpn_disconnected_status">已断开</string>
+    <string name="about_info">SmartProxy是一款工作在Android 4.0及以上系统的TCP透明代理客户端软件，无需ROOT权限。它根据配置文件的规则来决定使用代理还是直连。最关键的是能防DNS污染，永不掉线，还很省电。</string>
+    <string name="exit_confirm_info">这将会断开VPN连接，确定要退出吗？</string>
+    <string name="err_invalid_url">无效的配置地址</string>
+    <string name="config_url_hint">URL或本地文件路径</string>
+    <string name="ip_change_tips">电脑ip已经发生变化，点击重连</string>
+    <string name="proxy_ip_add">代理IP地址</string>
+    <string name="on">代理开</string>
+    <string name="off">代理关</string>
 </resources>

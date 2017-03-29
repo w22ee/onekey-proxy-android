@@ -14,36 +14,35 @@ import android.os.Bundle;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.widget.*;
+import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.widget.EditText;
+import android.widget.ScrollView;
+import android.widget.TextView;
+import android.widget.Toast;
+
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
-import me.smartproxy.R;
-import me.smartproxy.core.LocalVpnService;
+import com.kyleduo.switchbutton.SwitchButton;
 
 import java.io.File;
 import java.util.Calendar;
 
+import me.smartproxy.R;
+import me.smartproxy.core.LocalVpnService;
+
 public class MainActivity extends Activity implements
-        View.OnClickListener,
         OnCheckedChangeListener,
         LocalVpnService.onStatusChangedListener {
 
-    private static String GL_HISTORY_LOGS;
-
     private static final String TAG = MainActivity.class.getSimpleName();
-
     private static final String CONFIG_URL_KEY = "CONFIG_URL_KEY";
-
     private static final int START_VPN_SERVICE_REQUEST_CODE = 1985;
-
-    private Switch switchProxy;
+    private static String GL_HISTORY_LOGS;
+    private SwitchButton switchProxy;
     private TextView textViewLog;
     private ScrollView scrollViewLog;
-    private TextView textViewConfigUrl;
+    private EditText textViewConfigUrl;
     private Calendar mCalendar;
 
     @Override
@@ -53,12 +52,9 @@ public class MainActivity extends Activity implements
 
         scrollViewLog = (ScrollView) findViewById(R.id.scrollViewLog);
         textViewLog = (TextView) findViewById(R.id.textViewLog);
-        findViewById(R.id.configUrlLayout).setOnClickListener(this);
-
-        textViewConfigUrl = (TextView) findViewById(R.id.textViewConfigUrl);
+        textViewConfigUrl = (EditText) findViewById(R.id.proxy_ip_add_et);
         String configUrl = readConfigUrl();
         if (TextUtils.isEmpty(configUrl)) {
-            textViewConfigUrl.setText(R.string.config_not_set_value);
         } else {
             textViewConfigUrl.setText(configUrl);
         }
@@ -68,6 +64,9 @@ public class MainActivity extends Activity implements
 
         mCalendar = Calendar.getInstance();
         LocalVpnService.addOnStatusChangedListener(this);
+        switchProxy = (SwitchButton) findViewById(R.id.proxy_switch);
+        switchProxy.setChecked(LocalVpnService.IsRunning);
+        switchProxy.setOnCheckedChangeListener(this);
     }
 
     String readConfigUrl() {
@@ -79,7 +78,7 @@ public class MainActivity extends Activity implements
         SharedPreferences preferences = getSharedPreferences("SmartProxy", MODE_PRIVATE);
         Editor editor = preferences.edit();
         editor.putString(CONFIG_URL_KEY, configUrl);
-        editor.commit();
+        editor.apply();
     }
 
     String getVersionName() {
@@ -125,33 +124,6 @@ public class MainActivity extends Activity implements
         }
     }
 
-    @Override
-    public void onClick(View v) {
-        if (switchProxy.isChecked()) {
-            return;
-        }
-
-        new AlertDialog.Builder(this)
-                .setTitle(R.string.config_url)
-                .setItems(new CharSequence[]{
-                        getString(R.string.config_url_scan),
-                        getString(R.string.config_url_manual)
-                }, new OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        switch (i) {
-                            case 0:
-                                scanForConfigUrl();
-                                break;
-                            case 1:
-                                showConfigUrlInputDialog();
-                                break;
-                        }
-                    }
-                })
-                .show();
-    }
-
     private void scanForConfigUrl() {
         new IntentIntegrator(this)
                 .setResultDisplayDuration(0)
@@ -166,7 +138,7 @@ public class MainActivity extends Activity implements
         editText.setText(readConfigUrl());
 
         new AlertDialog.Builder(this)
-                .setTitle(R.string.config_url)
+                .setTitle(R.string.app_name)
                 .setView(editText)
                 .setPositiveButton(R.string.btn_ok, new OnClickListener() {
                     @Override
@@ -234,7 +206,12 @@ public class MainActivity extends Activity implements
     }
 
     private void startVPNService() {
-        String configUrl = readConfigUrl();
+        String configUrl = textViewConfigUrl.getText().toString();
+
+        if (!configUrl.startsWith("http")) {
+            configUrl = "http://" + configUrl;
+        }
+
         if (!isValidUrl(configUrl)) {
             Toast.makeText(this, R.string.err_invalid_url, Toast.LENGTH_SHORT).show();
             switchProxy.post(new Runnable() {
@@ -280,71 +257,6 @@ public class MainActivity extends Activity implements
         }
 
         super.onActivityResult(requestCode, resultCode, intent);
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main_activity_actions, menu);
-
-        MenuItem menuItem = menu.findItem(R.id.menu_item_switch);
-        if (menuItem == null) {
-            return false;
-        }
-
-        switchProxy = (Switch) menuItem.getActionView();
-        if (switchProxy == null) {
-            return false;
-        }
-
-        switchProxy.setChecked(LocalVpnService.IsRunning);
-        switchProxy.setOnCheckedChangeListener(this);
-
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.menu_item_about:
-                new AlertDialog.Builder(this)
-                        .setTitle(getString(R.string.app_name) + getVersionName())
-                        .setMessage(R.string.about_info)
-                        .setPositiveButton(R.string.btn_ok, null)
-                        .setNegativeButton(R.string.btn_more, new OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://smartproxy.me")));
-                            }
-                        })
-                        .show();
-
-                return true;
-            case R.id.menu_item_exit:
-                if (!LocalVpnService.IsRunning) {
-                    finish();
-                    return true;
-                }
-
-                new AlertDialog.Builder(this)
-                        .setTitle(R.string.menu_item_exit)
-                        .setMessage(R.string.exit_confirm_info)
-                        .setPositiveButton(R.string.btn_ok, new OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                LocalVpnService.IsRunning = false;
-                                LocalVpnService.Instance.disconnectVPN();
-                                stopService(new Intent(MainActivity.this, LocalVpnService.class));
-                                System.runFinalization();
-                                System.exit(0);
-                            }
-                        })
-                        .setNegativeButton(R.string.btn_cancel, null)
-                        .show();
-
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
     }
 
     @Override
