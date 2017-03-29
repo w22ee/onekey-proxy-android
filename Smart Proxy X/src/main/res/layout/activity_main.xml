@@ -18,9 +18,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/red"
-            android:padding="@dimen/activity_vertical_margin"
+            android:padding="10dp"
             android:text="@string/ip_change_tips"
-            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textAppearance="?android:attr/textAppearanceSmall"
             android:textColor="@color/text_6" />
 
         <RelativeLayout
