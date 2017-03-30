@@ -6,10 +6,11 @@
     android:background="@color/white">
 
     <LinearLayout
-        android:id="@+id/configUrlLayout"
+        android:id="@+id/setting_ll"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
+        android:background="@color/bg"
         android:orientation="vertical">
 
 
@@ -21,7 +22,13 @@
             android:padding="10dp"
             android:text="@string/ip_change_tips"
             android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textColor="@color/text_6" />
+            android:textColor="@color/text_6"
+            android:visibility="gone" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/divider" />
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -30,7 +37,7 @@
 
             <TextView
                 android:id="@+id/proxy_ip_add_title"
-                android:layout_width="wrap_content"
+                android:layout_width="@dimen/text_width"
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
                 android:layout_centerVertical="true"
@@ -47,24 +54,89 @@
                 android:layout_toRightOf="@+id/proxy_ip_add_title"
                 android:background="@drawable/button_bg_white"
                 android:hint="@string/config_not_set_value"
-                android:text="10.12.66.140"
+                android:paddingLeft="5dp"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:textColor="@color/text_6" />
         </RelativeLayout>
 
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/activity_vertical_margin">
+
+            <TextView
+                android:id="@+id/proxy_ip_port_title"
+                android:layout_width="@dimen/text_width"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
+                android:padding="3dp"
+                android:text="@string/proxy_port"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="@color/text_6" />
+
+            <EditText
+                android:id="@+id/proxy_ip_port_et"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_centerVertical="true"
+                android:layout_toRightOf="@+id/proxy_ip_port_title"
+                android:background="@drawable/button_bg_white"
+                android:hint="@string/config_not_set_value"
+                android:paddingLeft="5dp"
+                android:text="8888"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="@color/text_6" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/activity_vertical_margin">
+
+            <TextView
+                android:id="@+id/proxy_app"
+                android:layout_width="@dimen/text_width"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
+                android:padding="3dp"
+                android:text="@string/proxy_app"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="@color/text_6" />
+
+            <EditText
+                android:id="@+id/proxy_app_et"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_centerVertical="true"
+                android:layout_toRightOf="@+id/proxy_app"
+                android:background="@drawable/button_bg_white"
+                android:hint="@string/app_not_set_value"
+                android:paddingLeft="5dp"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="@color/text_6" />
+        </RelativeLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/divider" />
     </LinearLayout>
 
 
     <com.kyleduo.switchbutton.SwitchButton
         android:id="@+id/proxy_switch"
         android:layout_width="wrap_content"
-        android:layout_height="40dp"
-        android:layout_below="@+id/configUrlLayout"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/setting_ll"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="@dimen/activity_vertical_margin"
-        android:padding="10dp"
+        android:textSize="20dp"
         app:kswTextOff="@string/off"
-        app:kswTextOn="@string/on" />
+        app:kswTextOn="@string/on"
+        app:kswThumbHeight="50dp"
+        app:kswThumbWidth="50dp" />
 
 
     <ScrollView
@@ -86,8 +158,9 @@
 
             <TextView
                 android:id="@+id/textViewLog"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:textColor="@color/text_6"
                 android:padding="13dp"
                 android:textAppearance="?android:attr/textAppearanceSmall" />
 

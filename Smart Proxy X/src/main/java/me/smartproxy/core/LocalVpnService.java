@@ -10,6 +10,7 @@ import android.net.VpnService;
 import android.os.Build;
 import android.os.Handler;
 import android.os.ParcelFileDescriptor;
+import android.text.TextUtils;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -34,6 +35,7 @@ public class LocalVpnService extends VpnService implements Runnable {
 
     public static LocalVpnService Instance;
     public static String ConfigUrl;
+    public static String ListenPackageName;
     public static boolean IsRunning = false;
 
     private static int ID;
@@ -180,10 +182,6 @@ public class LocalVpnService extends VpnService implements Runnable {
                     writeLog("Load config from %s ...", ConfigUrl);
                     try {
                         ProxyConfig.Instance.loadFromUrl(ConfigUrl);
-//						if(ProxyConfig.Instance.getDefaultProxy()==null){
-//							throw new Exception("Invalid config file.");
-//						}
-//						writeLog("PROXY %s", ProxyConfig.Instance.getDefaultProxy());
                     } catch (Exception e) {
                         String errString = e.getMessage();
                         if (errString == null || errString.isEmpty()) {
@@ -323,7 +321,9 @@ public class LocalVpnService extends VpnService implements Runnable {
     private ParcelFileDescriptor establishVPN() throws Exception {
         Builder builder = new Builder();
         builder.setMtu(ProxyConfig.Instance.getMTU());
-//        builder.addAllowedApplication("me.ele.napos");
+        if (TextUtils.isEmpty(ListenPackageName)) {
+            builder.addAllowedApplication(ListenPackageName);
+        }
         if (ProxyConfig.IS_DEBUG)
             System.out.printf("setMtu: %d\n", ProxyConfig.Instance.getMTU());
 

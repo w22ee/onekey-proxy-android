@@ -1,24 +1,20 @@
 package me.smartproxy.ui;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
-import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.zxing.integration.android.IntentIntegrator;
-import com.google.zxing.integration.android.IntentResult;
 import com.kyleduo.switchbutton.SwitchButton;
 
 import java.io.File;
@@ -41,6 +37,9 @@ public class MainActivity extends Activity implements
     private EditText textViewConfigUrl;
     private Calendar mCalendar;
     private TextView ipChangeTips;
+    private LinearLayout setttingLL;
+    private EditText proxyIpPortEt;
+    private EditText proxyAppEt;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,11 +49,14 @@ public class MainActivity extends Activity implements
         scrollViewLog = (ScrollView) findViewById(R.id.scrollViewLog);
         textViewLog = (TextView) findViewById(R.id.textViewLog);
         textViewConfigUrl = (EditText) findViewById(R.id.proxy_ip_add_et);
-        String configUrl = readConfigUrl();
-        if (TextUtils.isEmpty(configUrl)) {
-        } else {
-            textViewConfigUrl.setText(configUrl);
-        }
+        setttingLL = (LinearLayout) findViewById(R.id.setting_ll);
+        proxyIpPortEt = (EditText) findViewById(R.id.proxy_ip_port_et);
+        proxyAppEt = (EditText) findViewById(R.id.proxy_app_et);
+//        String configUrl = readConfigUrl();
+//        if (TextUtils.isEmpty(configUrl)) {
+//        } else {
+//            textViewConfigUrl.setText(configUrl);
+//        }
 
         ipChangeTips = (TextView) findViewById(R.id.ip_change_tips);
         ipChangeTips.setText("");
@@ -79,21 +81,6 @@ public class MainActivity extends Activity implements
         Editor editor = preferences.edit();
         editor.putString(CONFIG_URL_KEY, configUrl);
         editor.apply();
-    }
-
-    String getVersionName() {
-        PackageManager packageManager = getPackageManager();
-        if (packageManager == null) {
-            Log.e(TAG, "null package manager is impossible");
-            return null;
-        }
-
-        try {
-            return packageManager.getPackageInfo(getPackageName(), 0).versionName;
-        } catch (PackageManager.NameNotFoundException e) {
-            Log.e(TAG, "package not found is impossible", e);
-            return null;
-        }
     }
 
     boolean isValidUrl(String url) {
@@ -124,7 +111,6 @@ public class MainActivity extends Activity implements
         }
     }
 
-    @SuppressLint("DefaultLocale")
     @Override
     public void onLogReceived(String logString) {
         mCalendar.setTimeInMillis(System.currentTimeMillis());
@@ -154,6 +140,10 @@ public class MainActivity extends Activity implements
 
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
+
+        setttingLL.setEnabled(isChecked);
+
         if (LocalVpnService.IsRunning != isChecked) {
             if (isChecked) {
                 Intent intent = LocalVpnService.prepare(this);
@@ -171,9 +161,14 @@ public class MainActivity extends Activity implements
 
     private void startVPNService() {
         String configUrl = textViewConfigUrl.getText().toString();
+        String prot = proxyIpPortEt.getText().toString();
+
+        if (TextUtils.isEmpty(prot)) {
+            prot = "8888";
+        }
 
         if (!configUrl.startsWith("http")) {
-            configUrl = "http://" + configUrl;
+            configUrl = "http://" + configUrl + ":" + prot;
         }
 
         if (!isValidUrl(configUrl)) {
@@ -192,6 +187,7 @@ public class MainActivity extends Activity implements
         GL_HISTORY_LOGS = null;
         onLogReceived("starting...");
         LocalVpnService.ConfigUrl = configUrl;
+        LocalVpnService.ListenPackageName = proxyAppEt.getText().toString();
         startService(new Intent(this, LocalVpnService.class));
     }
 
@@ -208,17 +204,17 @@ public class MainActivity extends Activity implements
             return;
         }
 
-        IntentResult scanResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, intent);
-        if (scanResult != null) {
-            String configUrl = scanResult.getContents();
-            if (isValidUrl(configUrl)) {
-                setConfigUrl(configUrl);
-                textViewConfigUrl.setText(configUrl);
-            } else {
-                Toast.makeText(MainActivity.this, R.string.err_invalid_url, Toast.LENGTH_SHORT).show();
-            }
-            return;
-        }
+//        IntentResult scanResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, intent);
+//        if (scanResult != null) {
+//            String configUrl = scanResult.getContents();
+//            if (isValidUrl(configUrl)) {
+//                setConfigUrl(configUrl);
+//                textViewConfigUrl.setText(configUrl);
+//            } else {
+//                Toast.makeText(MainActivity.this, R.string.err_invalid_url, Toast.LENGTH_SHORT).show();
+//            }
+//            return;
+//        }
 
         super.onActivityResult(requestCode, resultCode, intent);
     }
@@ -233,7 +229,7 @@ public class MainActivity extends Activity implements
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         String pcIp = intent.getStringExtra("pc_ip");
-        if (pcIp!=null){
+        if (pcIp != null) {
             ipChangeTips.setText("pc ip is get " + pcIp);
             textViewConfigUrl.setText(pcIp);
 
@@ -247,7 +243,6 @@ public class MainActivity extends Activity implements
                 }
             }
         }
-
     }
 
 }

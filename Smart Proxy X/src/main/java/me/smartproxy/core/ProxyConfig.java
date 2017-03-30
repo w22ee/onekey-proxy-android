@@ -2,6 +2,7 @@ package me.smartproxy.core;
 
 import android.annotation.SuppressLint;
 import android.os.Build;
+import android.text.TextUtils;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -234,15 +235,12 @@ public class ProxyConfig {
     }
 
     public void loadFromUrl(String url) throws Exception {
-        String[] urls = new String[1];
-        if (url != null) {
-            urls[0] = url + ":8888";
-        }
 
-        for (String m : urls) {
-            System.out.println("add urls " + m);
+        if (TextUtils.isEmpty(url)) {
+            System.out.println("add null");
+            return;
         }
-
+        System.out.println("add url " + url);
 
         m_IpList.clear();
         m_DnsList.clear();
@@ -251,7 +249,7 @@ public class ProxyConfig {
         m_DomainMap.clear();
 
         try {
-            addProxyToList(urls, 0);
+            addProxyUrlToList(url);
 //            addDomainToHashMap(new String[]{}, 1, true);
         } catch (Exception e) {
             throw new Exception(String.format("SmartProxy config file parse error: line:%d, tag:%s, error:%s", url, e));
@@ -343,28 +341,44 @@ public class ProxyConfig {
 //        }
 //    }
 
-    private void addProxyToList(String[] items, int offset) throws Exception {
-        for (int i = offset; i < items.length; i++) {
-            String proxyString = items[i].trim();
-            Config config = null;
-            if (proxyString.startsWith("ss://")) {
-                config = ShadowsocksConfig.parse(proxyString);
-            } else {
-                if (!proxyString.toLowerCase().startsWith("http://")) {
-                    proxyString = "http://" + proxyString;
-                }
-                System.out.println("add proxy " + proxyString);
-                config = HttpConnectConfig.parse(proxyString);
+//    private void addProxyToList(String[] items, int offset) throws Exception {
+//        for (int i = offset; i < items.length; i++) {
+//            String proxyString = items[i].trim();
+//            Config config = null;
+//            if (proxyString.startsWith("ss://")) {
+//                config = ShadowsocksConfig.parse(proxyString);
+//            } else {
+//                if (!proxyString.toLowerCase().startsWith("http://")) {
+//                    proxyString = "http://" + proxyString;
+//                }
+//                System.out.println("add proxy " + proxyString);
+//                config = HttpConnectConfig.parse(proxyString);
+//            }
+//            if (!m_ProxyList.contains(config)) {
+//                m_ProxyList.add(config);
+//
+//                m_DomainMap.put(config.ServerAddress.getHostName(), false);
+//            }
+//        }
+//
+//    }
+
+    private void addProxyUrlToList(String url) throws Exception {
+        String proxyString = url.trim();
+        Config config = null;
+        if (proxyString.startsWith("ss://")) {
+            config = ShadowsocksConfig.parse(proxyString);
+        } else {
+            if (!proxyString.toLowerCase().startsWith("http://")) {
+                proxyString = "http://" + proxyString;
             }
-            if (!m_ProxyList.contains(config)) {
-                m_ProxyList.add(config);
-
-                m_DomainMap.put(config.ServerAddress.getHostName(), false);
-            }
-
-
+            System.out.println("add proxy " + proxyString);
+            config = HttpConnectConfig.parse(proxyString);
         }
-
+        if (!m_ProxyList.contains(config)) {
+            m_ProxyList.add(config);
+            m_DomainMap.put(config.ServerAddress.getHostName(), false);
+        }
     }
 
     private void addDomainToHashMap(String[] items, int offset, Boolean state) {

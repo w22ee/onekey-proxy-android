@@ -22,4 +22,7 @@
     <string name="proxy_ip_add">代理IP地址</string>
     <string name="on">代理开</string>
     <string name="off">代理关</string>
+    <string name="proxy_port">端口号</string>
+    <string name="proxy_app">代理app包名</string>
+    <string name="app_not_set_value">默认为所有</string>
 </resources>

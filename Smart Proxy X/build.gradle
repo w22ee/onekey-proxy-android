@@ -29,17 +29,17 @@ android {
     }
     signingConfigs {
         release {
-            storeFile file("[android.keystore]")
-            storePassword System.getenv("KSTOREPWD")
-            keyAlias "[smartproxy]"
-            keyPassword System.getenv("KEYPWD")
+//            storeFile file("[android.keystore]")
+//            storePassword System.getenv("KSTOREPWD")
+//            keyAlias "[smartproxy]"
+//            keyPassword System.getenv("KEYPWD")
         }
     }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
-            signingConfig signingConfigs.release
+            signingConfig signingConfigs.debug
         }
     }
     productFlavors {
