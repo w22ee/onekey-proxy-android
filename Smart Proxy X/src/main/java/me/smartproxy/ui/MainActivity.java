@@ -7,8 +7,8 @@ import android.content.SharedPreferences.Editor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.view.View;
 import android.widget.CompoundButton;
-import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
@@ -24,8 +24,7 @@ import me.smartproxy.R;
 import me.smartproxy.core.LocalVpnService;
 
 public class MainActivity extends Activity implements
-        OnCheckedChangeListener,
-        LocalVpnService.onStatusChangedListener {
+        LocalVpnService.onStatusChangedListener, View.OnClickListener, CompoundButton.OnCheckedChangeListener {
 
     private static final String TAG = MainActivity.class.getSimpleName();
     private static final String CONFIG_URL_KEY = "CONFIG_URL_KEY";
@@ -34,10 +33,10 @@ public class MainActivity extends Activity implements
     private SwitchButton switchProxy;
     private TextView textViewLog;
     private ScrollView scrollViewLog;
-    private EditText textViewConfigUrl;
     private Calendar mCalendar;
     private TextView ipChangeTips;
     private LinearLayout setttingLL;
+    private EditText proxyIpAddEt;
     private EditText proxyIpPortEt;
     private EditText proxyAppEt;
 
@@ -48,27 +47,30 @@ public class MainActivity extends Activity implements
 
         scrollViewLog = (ScrollView) findViewById(R.id.scrollViewLog);
         textViewLog = (TextView) findViewById(R.id.textViewLog);
-        textViewConfigUrl = (EditText) findViewById(R.id.proxy_ip_add_et);
+        proxyIpAddEt = (EditText) findViewById(R.id.proxy_ip_add_et);
         setttingLL = (LinearLayout) findViewById(R.id.setting_ll);
         proxyIpPortEt = (EditText) findViewById(R.id.proxy_ip_port_et);
         proxyAppEt = (EditText) findViewById(R.id.proxy_app_et);
-//        String configUrl = readConfigUrl();
-//        if (TextUtils.isEmpty(configUrl)) {
-//        } else {
-//            textViewConfigUrl.setText(configUrl);
-//        }
-
         ipChangeTips = (TextView) findViewById(R.id.ip_change_tips);
-        ipChangeTips.setText("");
+        switchProxy = (SwitchButton) findViewById(R.id.proxy_switch);
+        mCalendar = Calendar.getInstance();
 
+
+        ipChangeTips.setText("");
         textViewLog.setText(GL_HISTORY_LOGS);
         scrollViewLog.fullScroll(ScrollView.FOCUS_DOWN);
 
-        mCalendar = Calendar.getInstance();
+
         LocalVpnService.addOnStatusChangedListener(this);
-        switchProxy = (SwitchButton) findViewById(R.id.proxy_switch);
         switchProxy.setChecked(LocalVpnService.IsRunning);
+        switchProxy.setOnClickListener(this);
         switchProxy.setOnCheckedChangeListener(this);
+
+        if (!TextUtils.isEmpty(readConfigUrl())) {
+            proxyIpAddEt.setText(readConfigUrl());
+        }
+        System.out.println("oncreate vpn");
+        duelIntent(getIntent());
     }
 
     String readConfigUrl() {
@@ -138,34 +140,23 @@ public class MainActivity extends Activity implements
         Toast.makeText(this, status, Toast.LENGTH_SHORT).show();
     }
 
-    @Override
-    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 
-
-        setttingLL.setEnabled(isChecked);
-
-        if (LocalVpnService.IsRunning != isChecked) {
-            if (isChecked) {
-                Intent intent = LocalVpnService.prepare(this);
-                if (intent == null) {
-                    startVPNService();
-                } else {
-                    startActivityForResult(intent, START_VPN_SERVICE_REQUEST_CODE);
-                }
-            } else {
-                LocalVpnService.IsRunning = false;
-            }
-        }
+    private void setEditAble(boolean editAble) {
+        proxyIpAddEt.setEnabled(editAble);
+        proxyIpPortEt.setEnabled(editAble);
+        proxyAppEt.setEnabled(editAble);
     }
 
 
     private void startVPNService() {
-        String configUrl = textViewConfigUrl.getText().toString();
+        String configUrl = proxyIpAddEt.getText().toString();
         String prot = proxyIpPortEt.getText().toString();
 
         if (TextUtils.isEmpty(prot)) {
             prot = "8888";
         }
+
+        String withoutPort = new String(configUrl);
 
         if (!configUrl.startsWith("http")) {
             configUrl = "http://" + configUrl + ":" + prot;
@@ -188,6 +179,7 @@ public class MainActivity extends Activity implements
         onLogReceived("starting...");
         LocalVpnService.ConfigUrl = configUrl;
         LocalVpnService.ListenPackageName = proxyAppEt.getText().toString();
+        setConfigUrl(withoutPort);
         startService(new Intent(this, LocalVpnService.class));
     }
 
@@ -204,18 +196,6 @@ public class MainActivity extends Activity implements
             return;
         }
 
-//        IntentResult scanResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, intent);
-//        if (scanResult != null) {
-//            String configUrl = scanResult.getContents();
-//            if (isValidUrl(configUrl)) {
-//                setConfigUrl(configUrl);
-//                textViewConfigUrl.setText(configUrl);
-//            } else {
-//                Toast.makeText(MainActivity.this, R.string.err_invalid_url, Toast.LENGTH_SHORT).show();
-//            }
-//            return;
-//        }
-
         super.onActivityResult(requestCode, resultCode, intent);
     }
 
@@ -228,21 +208,56 @@ public class MainActivity extends Activity implements
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
+        System.out.println("onNewIntent vpn");
+        duelIntent(intent);
+    }
+
+    private void duelIntent(Intent intent) {
+        if (intent == null) {
+            return;
+        }
         String pcIp = intent.getStringExtra("pc_ip");
         if (pcIp != null) {
             ipChangeTips.setText("pc ip is get " + pcIp);
-            textViewConfigUrl.setText(pcIp);
-
+            proxyIpAddEt.setText(pcIp);
             switchProxy.setChecked(true);
             if (LocalVpnService.IsRunning == false) {
-                Intent intent2 = LocalVpnService.prepare(this);
-                if (intent2 == null) {
-                    startVPNService();
-                } else {
-                    startActivityForResult(intent2, START_VPN_SERVICE_REQUEST_CODE);
-                }
+                System.out.println("intent start vpn");
+                startProxy();
+            }
+        }
+
+    }
+
+    private void startProxy() {
+        Intent intent = LocalVpnService.prepare(this);
+        if (intent == null) {
+            startVPNService();
+        } else {
+            startActivityForResult(intent, START_VPN_SERVICE_REQUEST_CODE);
+        }
+    }
+
+    @Override
+    public void onClick(View v) {
+
+        boolean isChecked = switchProxy.isChecked();
+        System.out.println("onCheckedclick  vpn is" + isChecked);
+
+
+        if (LocalVpnService.IsRunning != isChecked) {
+            if (isChecked) {
+                System.out.println("onCheckedChanged start vpn");
+                startProxy();
+            } else {
+                //关闭vpn
+                LocalVpnService.IsRunning = false;
             }
         }
     }
 
+    @Override
+    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        setEditAble(!isChecked);
+    }
 }

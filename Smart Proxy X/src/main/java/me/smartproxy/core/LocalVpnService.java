@@ -321,8 +321,11 @@ public class LocalVpnService extends VpnService implements Runnable {
     private ParcelFileDescriptor establishVPN() throws Exception {
         Builder builder = new Builder();
         builder.setMtu(ProxyConfig.Instance.getMTU());
-        if (TextUtils.isEmpty(ListenPackageName)) {
+        if (!TextUtils.isEmpty(ListenPackageName)) {
             builder.addAllowedApplication(ListenPackageName);
+            writeLog("ListenPackageName " + ListenPackageName);
+        }else {
+            writeLog("Listen all Package");
         }
         if (ProxyConfig.IS_DEBUG)
             System.out.printf("setMtu: %d\n", ProxyConfig.Instance.getMTU());
