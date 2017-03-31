@@ -92,7 +92,8 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="@dimen/activity_vertical_margin">
+            android:padding="@dimen/activity_vertical_margin"
+            android:visibility="gone">
 
             <TextView
                 android:id="@+id/proxy_app"
@@ -160,9 +161,9 @@
                 android:id="@+id/textViewLog"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColor="@color/text_6"
                 android:padding="13dp"
-                android:textAppearance="?android:attr/textAppearanceSmall" />
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="@color/text_6" />
 
         </LinearLayout>
     </ScrollView>
