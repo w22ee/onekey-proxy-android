@@ -225,7 +225,13 @@ public class MainActivity extends Activity implements
                 System.out.println("intent start vpn");
                 startProxy();
             }
+        }else {
+            boolean close = intent.getBooleanExtra("close",false);
+            if (close){
+                LocalVpnService.IsRunning = false;
+            }
         }
+
 
     }
 
