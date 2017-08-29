@@ -13,9 +13,9 @@
         android:theme="@style/AppTheme">
 
         <activity
-            android:name="me.com.lixi.ui.MainActivity"
-            android:theme="@android:style/Theme.Material.NoActionBar"
+            android:name="me.lixi.ui.MainActivity"
             android:launchMode="singleInstance"
+            android:theme="@android:style/Theme.Holo.NoActionBar"
             android:windowSoftInputMode="stateHidden">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -24,7 +24,7 @@
         </activity>
 
         <service
-            android:name="me.com.lixi.core.LocalVpnService"
+            android:name="me.lixi.core.LocalVpnService"
             android:permission="android.permission.BIND_VPN_SERVICE">
             <intent-filter>
                 <action android:name="android.net.VpnService" />
