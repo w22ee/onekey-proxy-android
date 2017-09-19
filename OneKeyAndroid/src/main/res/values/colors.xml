@@ -6,5 +6,6 @@
     <color name="red">#e29487</color>
     <color name="text_6">#666666</color>
     <color name="divider">#cccccc</color>
-    <color name="bg">#f9f9eb</color>
+    <color name="bg">#2d96ff</color>
+    <color name="gray_bg">#FFE6E6E6</color>
 </resources>
