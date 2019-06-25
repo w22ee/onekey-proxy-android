@@ -7,6 +7,7 @@ import android.content.SharedPreferences.Editor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.EditText;
@@ -15,13 +16,16 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.flexbox.FlexboxLayout;
 import com.kyleduo.switchbutton.SwitchButton;
 
 import java.io.File;
 import java.util.Calendar;
+import java.util.List;
 
 import me.lixi.R;
 import me.lixi.core.LocalVpnService;
+import me.lixi.store.SPUtils;
 
 public class MainActivity extends Activity implements
         LocalVpnService.onStatusChangedListener, View.OnClickListener, CompoundButton.OnCheckedChangeListener {
@@ -39,6 +43,7 @@ public class MainActivity extends Activity implements
     private EditText proxyIpAddEt;
     private EditText proxyIpPortEt;
     private EditText proxyAppEt;
+    private FlexboxLayout accountGroup;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +58,7 @@ public class MainActivity extends Activity implements
         proxyAppEt = (EditText) findViewById(R.id.proxy_app_et);
         ipChangeTips = (TextView) findViewById(R.id.ip_change_tips);
         switchProxy = (SwitchButton) findViewById(R.id.proxy_switch);
+        accountGroup = (FlexboxLayout) findViewById(R.id.account_group);
         mCalendar = Calendar.getInstance();
 
 
@@ -60,7 +66,7 @@ public class MainActivity extends Activity implements
         textViewLog.setText(GL_HISTORY_LOGS);
         scrollViewLog.fullScroll(ScrollView.FOCUS_DOWN);
 
-
+        showAccountHistory();
         LocalVpnService.addOnStatusChangedListener(this);
         switchProxy.setChecked(LocalVpnService.IsRunning);
         switchProxy.setOnClickListener(this);
@@ -71,6 +77,30 @@ public class MainActivity extends Activity implements
         }
         System.out.println("oncreate vpn");
         duelIntent(getIntent());
+    }
+
+    private void showAccountHistory() {
+        List<String> accountHistory = SPUtils.getAccountInfo(this);
+        int size = accountHistory == null ? 0 : accountHistory.size();
+        accountGroup.setVisibility(size > 0 ? View.VISIBLE : View.GONE);
+        accountGroup.removeAllViews();
+        for (int i = 0; i < size; i++) {
+            final String content = accountHistory.get(i);
+            View view = LayoutInflater.from(this).inflate(R.layout.item_account_layout, null);
+            accountGroup.addView(view);
+            ((TextView) view.findViewById(R.id.name)).setText(content);
+            view.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (!LocalVpnService.IsRunning) {
+                        proxyIpAddEt.setText(content);
+                    } else {
+                        Toast.makeText(MainActivity.this, "关闭代理后，才能修改IP", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+        }
+
     }
 
     String readConfigUrl() {
@@ -137,6 +167,10 @@ public class MainActivity extends Activity implements
         switchProxy.setEnabled(true);
         switchProxy.setChecked(isRunning);
         onLogReceived(status);
+        if (isRunning) {
+            SPUtils.saveAccountInfo(proxyIpAddEt.getEditableText().toString(), this);
+            showAccountHistory();
+        }
         Toast.makeText(this, status, Toast.LENGTH_SHORT).show();
     }
 
@@ -225,9 +259,9 @@ public class MainActivity extends Activity implements
                 System.out.println("intent start vpn");
                 startProxy();
             }
-        }else {
-            boolean close = intent.getBooleanExtra("close",false);
-            if (close){
+        } else {
+            boolean close = intent.getBooleanExtra("close", false);
+            if (close) {
                 LocalVpnService.IsRunning = false;
             }
         }

@@ -55,6 +55,8 @@ dependencies {
     compile 'com.embarkmobile:zxing-android-integration:2.0.0@aar'
     compile 'com.google.zxing:core:3.0.1'
     compile 'com.kyleduo.switchbutton:library:1.4.4'
+    compile 'com.google.android:flexbox:1.0.0'
+    compile 'com.google.code.gson:gson:2.8.5'
 }
 
 
