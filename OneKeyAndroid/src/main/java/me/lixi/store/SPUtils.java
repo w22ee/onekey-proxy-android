@@ -16,13 +16,15 @@ public class SPUtils {
         SharedPreferences preferences = context.getSharedPreferences("account", Context.MODE_PRIVATE);
         String data = preferences.getString("data", "");
         List<String> accountList = new ArrayList<>();
-        if (!TextUtils.isEmpty(data)) {
-            Gson gson = GsonFactory.getInstance().getGson();
-            accountList = gson.fromJson(data, new TypeToken<List<String>>() {
-            }.getType());
+        if (!TextUtils.isEmpty(account)) {
+            if (!TextUtils.isEmpty(data)) {
+                Gson gson = GsonFactory.getInstance().getGson();
+                accountList = gson.fromJson(data, new TypeToken<List<String>>() {
+                }.getType());
+            }
             if (accountList != null) {
-                String cache = accountList.get(accountList.size() - 1);
-                if (accountList.size() < 5) {
+                String cache = accountList.size() >= 1 ? accountList.get(accountList.size() - 1) : "";
+                if (accountList.size() < 5 && !account.equals(cache)) {
                     accountList.add(account);
                 } else if (!account.equals(cache)) {
                     accountList.remove(0);
