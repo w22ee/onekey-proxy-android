@@ -6,18 +6,25 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.net.ConnectivityManager;
+import android.net.LinkProperties;
+import android.net.Network;
+import android.net.NetworkInfo;
 import android.net.VpnService;
 import android.os.Build;
 import android.os.Handler;
 import android.os.ParcelFileDescriptor;
 import android.text.TextUtils;
+import android.util.Log;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.net.InetAddress;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -324,7 +331,7 @@ public class LocalVpnService extends VpnService implements Runnable {
         if (!TextUtils.isEmpty(ListenPackageName)) {
             builder.addAllowedApplication(ListenPackageName);
             writeLog("ListenPackageName " + ListenPackageName);
-        }else {
+        } else {
             writeLog("Listen all Package");
         }
         if (ProxyConfig.IS_DEBUG)
@@ -336,14 +343,14 @@ public class LocalVpnService extends VpnService implements Runnable {
         if (ProxyConfig.IS_DEBUG)
             System.out.printf("addAddress: %s/%d\n", ipAddress.Address, ipAddress.PrefixLength);
 
-        for (ProxyConfig.IPAddress dns : ProxyConfig.Instance.getDnsList()) {
+        for (IPAddress dns : ProxyConfig.Instance.getDnsList()) {
             builder.addDnsServer(dns.Address);
             if (ProxyConfig.IS_DEBUG)
                 System.out.printf("addDnsServer: %s\n", dns.Address);
         }
 
         if (ProxyConfig.Instance.getRouteList().size() > 0) {
-            for (ProxyConfig.IPAddress routeAddress : ProxyConfig.Instance.getRouteList()) {
+            for (IPAddress routeAddress : ProxyConfig.Instance.getRouteList()) {
                 builder.addRoute(routeAddress.Address, routeAddress.PrefixLength);
                 if (ProxyConfig.IS_DEBUG)
                     System.out.printf("addRoute: %s/%d\n", routeAddress.Address, routeAddress.PrefixLength);
@@ -358,20 +365,39 @@ public class LocalVpnService extends VpnService implements Runnable {
                 System.out.printf("addDefaultRoute: 0.0.0.0/0\n");
         }
 
+        ArrayList<String> servers = new ArrayList<>();
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && connectivityManager != null) {
+            for (Network network : connectivityManager.getAllNetworks()) {
+                NetworkInfo networkInfo = connectivityManager.getNetworkInfo(network);
+                if (networkInfo.isConnected()) {
+                    LinkProperties linkProperties = connectivityManager.getLinkProperties(network);
+                    List<InetAddress> inetAddresses = linkProperties.getDnsServers();
+                    int size = inetAddresses != null ? inetAddresses.size() : 0;
+                    for (int i = 0; i < size; i++) {
+                        InetAddress address = inetAddresses.get(i);
+                        if (address != null) {
+                            System.out.printf("network8.0 value:%s\n", address.getHostAddress());
+                            servers.add(address.getHostAddress());
+                            builder.addRoute(address.getHostAddress(), 32);
+                        }
+                    }
+                }
+            }
+        } else {
+            Class<?> SystemProperties = Class.forName("android.os.SystemProperties");
+            Method method = SystemProperties.getMethod("get", new Class[]{String.class});
 
-        Class<?> SystemProperties = Class.forName("android.os.SystemProperties");
-        Method method = SystemProperties.getMethod("get", new Class[]{String.class});
-        ArrayList<String> servers = new ArrayList<String>();
-        for (String name : new String[]{"net.dns1", "net.dns2", "net.dns3", "net.dns4",}) {
-            String value = (String) method.invoke(null, name);
-            if (value != null && !"".equals(value) && !servers.contains(value)) {
-                servers.add(value);
-                builder.addRoute(value, 32);
-                if (ProxyConfig.IS_DEBUG)
-                    System.out.printf("%s=%s\n", name, value);
+            for (String name : new String[]{"net.dns1", "net.dns2", "net.dns3", "net.dns4",}) {
+                String value = (String) method.invoke(null, name);
+                if (value != null && !"".equals(value) && !servers.contains(value)) {
+                    System.out.printf("network value:%s\n", value);
+
+                    if (ProxyConfig.IS_DEBUG)
+                        System.out.printf("network :%s=%s\n", name, value);
+                }
             }
         }
-
         Intent intent = new Intent(this, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
         builder.setConfigureIntent(pendingIntent);

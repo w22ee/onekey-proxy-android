@@ -66,7 +66,7 @@
 
             <TextView
                 android:id="@+id/proxy_ip_port_title"
-                android:layout_width="@dimen/text_width"
+                android:layout_width="123dp"
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
                 android:layout_centerVertical="true"
@@ -88,6 +88,15 @@
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:textColor="@color/text_6" />
         </RelativeLayout>
+
+        <com.google.android.flexbox.FlexboxLayout
+            android:id="@+id/account_group"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:background="@color/white"
+            android:layout_width="match_parent"
+            app:flexWrap="wrap"
+            android:layout_height="wrap_content" />
 
         <RelativeLayout
             android:layout_width="match_parent"
