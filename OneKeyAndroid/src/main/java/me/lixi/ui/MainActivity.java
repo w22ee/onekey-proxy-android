@@ -168,7 +168,7 @@ public class MainActivity extends Activity implements
         switchProxy.setChecked(isRunning);
         onLogReceived(status);
         if (isRunning) {
-            SPUtils.saveAccountInfo(proxyIpAddEt.getEditableText().toString(), this);
+//            SPUtils.saveAccountInfo(proxyIpAddEt.getEditableText().toString(), this);
             showAccountHistory();
         }
         Toast.makeText(this, status, Toast.LENGTH_SHORT).show();

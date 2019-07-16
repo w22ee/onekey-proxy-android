@@ -1,28 +1,21 @@
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:2.3.1'
-    }
-}
+
 apply plugin: 'com.android.application'
 
 repositories {
     mavenCentral()
-
+    jcenter()
     maven {
         url "https://raw.github.com/embarkmobile/zxing-android-minimal/mvn-repo/maven-repository/"
     }
 }
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion '25.0.2'
+    compileSdkVersion 28
+    buildToolsVersion '28.0.3'
     useLibrary 'org.apache.http.legacy'
     defaultConfig {
         minSdkVersion 14
-        targetSdkVersion 25
+        targetSdkVersion 28
         versionCode 8
         versionName "2.0"
         applicationId 'com.lixi.onkey'
@@ -45,7 +38,7 @@ android {
         variant.outputs.each { output ->
 //            output.outputFile = new File(output.outputFile.parent, defaultConfig.applicationId + "-" + buildType.name + "-v" +
 //                    defaultConfig.versionName + "-" + defaultConfig.versionCode + ".apk" );
-            output.outputFile = new File(output.outputFile.parent, "onekey.apk");
+//            output.outputFile = new File(output.outputFile.parent, "onekey.apk");
         }
     }
 }
