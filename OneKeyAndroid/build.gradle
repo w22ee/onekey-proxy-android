@@ -1,12 +1,8 @@
-
 apply plugin: 'com.android.application'
 
 repositories {
     mavenCentral()
     jcenter()
-    maven {
-        url "https://raw.github.com/embarkmobile/zxing-android-minimal/mvn-repo/maven-repository/"
-    }
 }
 
 android {
@@ -44,12 +40,9 @@ android {
 }
 
 dependencies {
-    compile 'com.embarkmobile:zxing-android-minimal:2.0.0@aar'
-    compile 'com.embarkmobile:zxing-android-integration:2.0.0@aar'
-    compile 'com.google.zxing:core:3.0.1'
-    compile 'com.kyleduo.switchbutton:library:1.4.4'
-    compile 'com.google.android:flexbox:1.0.0'
-    compile 'com.google.code.gson:gson:2.8.5'
+    implementation 'com.kyleduo.switchbutton:library:1.4.4'
+    implementation 'com.google.android:flexbox:1.0.0'
+    implementation 'com.google.code.gson:gson:2.8.5'
 }
 
 
