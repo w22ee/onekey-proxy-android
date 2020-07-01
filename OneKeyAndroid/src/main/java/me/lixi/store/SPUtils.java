@@ -23,11 +23,14 @@ public class SPUtils {
                 }.getType());
             }
             if (accountList != null) {
-                String cache = accountList.size() >= 1 ? accountList.get(accountList.size() - 1) : "";
-                if (accountList.size() < 5 && !account.equals(cache)) {
-                    accountList.add(account);
-                } else if (!account.equals(cache)) {
-                    accountList.remove(0);
+                boolean h = false;
+                for (String ips : accountList) {
+                    if (ips.equals(account)) {
+                        h = true;
+                        break;
+                    }
+                }
+                if (!h) {
                     accountList.add(account);
                 }
             }
